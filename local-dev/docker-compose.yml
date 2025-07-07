@@ -10,6 +10,18 @@ services:
     volumes:
       - ../wordpress:/var/www/html
     tty: true
+    depends_on:
+      - phpmyadmin
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    build:
+      context: ./phpmyadmin
+      dockerfile: Dockerfile
+    ports:
+      - 8002:80
+    depends_on:
+      - db
 
   db:
     container_name: db
@@ -18,3 +30,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./db/volume:/var/lib/mysql
+    healthcheck:
+      test: "mysqladmin ping -h 127.0.0.1 -u wp_user -pwp_pass"
+      timeout: 5s
+      interval: 5s
+      retries: 10
